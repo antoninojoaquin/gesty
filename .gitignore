@@ -47,3 +47,7 @@ yarn-error.*
 Thumbs.db
 .vscode/
 .idea/
+
+# Native build leftovers
+.kotlin/
+*.orig.*
