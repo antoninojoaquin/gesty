@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Gesty",
+    "slug": "gesty",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "gesty",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0E0E10",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.joaquin.gesty",
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0E0E10"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
