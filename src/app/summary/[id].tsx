@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Check, ChevronLeft, Lock, Pencil, Share2, Trash2 } from 'lucide-react-native';
+import { Check, ChevronLeft, Lock, Pencil, Share2, Trash2 } from '@/components/icons';
 import { useEffect, useState } from 'react';
 import { BackHandler, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 

@@ -1,4 +1,4 @@
-import { AlertCircle, type LucideIcon } from 'lucide-react-native';
+import { AlertCircle, type LucideIcon } from '@/components/icons';
 
 import { showDialog, type DialogTone } from '@/components/DialogHost';
 import { UserError } from '@/db/types';

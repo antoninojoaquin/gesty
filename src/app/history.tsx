@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ChevronLeft, ChevronRight, Lock } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Lock } from '@/components/icons';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 

@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { CircleCheck, ChevronLeft, Download, Info, Upload } from 'lucide-react-native';
+import { CircleCheck, ChevronLeft, Download, Info, Upload } from '@/components/icons';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
