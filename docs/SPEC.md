@@ -109,7 +109,7 @@ Cada pantalla tiene su diseño de referencia en `docs/diseno/`. Respetá la estr
 - Tarjeta con **cantidad de envíos** (muy grande) y **total en pesos** (grande, en rojo claro).
 - Campo de texto "Dirección" + botón **"Agregar"** grande.
   - El campo tiene foco automático al entrar a la pantalla.
-  - Al tocar "Agregar" o Enter en el teclado: guarda, vacía el campo, **mantiene el teclado abierto** y da feedback (vibración corta con `expo-haptics` + el contador se actualiza).
+  - Al tocar "Agregar" o Enter en el teclado: guarda, vacía el campo, **cierra el teclado** (para que se vean el contador y la lista actualizados; se vuelve a abrir tocando el campo) y da feedback (vibración corta con `expo-haptics` + el contador se actualiza).
   - Si el campo está vacío, el botón está deshabilitado (gris).
   - **Autocompletar:** mientras escribe (desde 2 caracteres), mostrar hasta 3 sugerencias de direcciones cargadas antes (de cualquier turno), ordenadas por frecuencia, con la cantidad de veces usada. Tocar una la agrega directamente.
 - Lista de pedidos del turno, **el más nuevo arriba**, numerados, con hora. Tocar un pedido despliega debajo los botones Editar / Borrar.
