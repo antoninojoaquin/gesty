@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Clock, History, Plus, Settings, Square, Trash2 } from '@/components/icons';
 import { useEffect, useRef, useState } from 'react';
-import { AppState, FlatList, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
+import { AppState, FlatList, Keyboard, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -67,13 +67,16 @@ export default function ActiveShift() {
     try {
       await addDelivery(db, shift.id, clean, Date.now());
       setText('');
+      // Hide the keyboard so the updated count and list are visible right away.
+      Keyboard.dismiss();
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await reload();
     } catch (e) {
       showError('No se pudo agregar', e);
+      // Keep the typed address and the keyboard so it can be retried.
+      inputRef.current?.focus();
     } finally {
       setBusy(false);
-      inputRef.current?.focus();
     }
   }
 
@@ -173,7 +176,7 @@ export default function ActiveShift() {
           value={text}
           onChangeText={setText}
           onSubmitEditing={() => add(text)}
-          submitBehavior="submit"
+          submitBehavior="blurAndSubmit"
           autoFocus
           autoCapitalize="words"
           autoCorrect={false}
