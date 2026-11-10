@@ -1,4 +1,4 @@
-import { digitsOnly, formatMoney, isValidRate, parseRate } from '../money';
+import { digitsOnly, formatMoney, formatRateInput, isValidRate, parseRate } from '../money';
 
 describe('formatMoney', () => {
   it.each([
@@ -43,5 +43,20 @@ describe('digitsOnly / isValidRate', () => {
     expect(isValidRate(0)).toBe(false);
     expect(isValidRate(-5)).toBe(false);
     expect(isValidRate(2.5)).toBe(false);
+  });
+});
+
+describe('formatRateInput', () => {
+  it.each([
+    ['', ''],
+    ['3', '3'],
+    ['3000', '3.000'],
+    ['3.5000', '35.000'],
+    ['$ 4500', '4.500'],
+    ['0045', '45'],
+    ['0', '0'],
+    ['123456789', '1.234.567'],
+  ])('%p → %p', (input, expected) => {
+    expect(formatRateInput(input)).toBe(expected);
   });
 });
