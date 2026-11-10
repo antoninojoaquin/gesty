@@ -13,5 +13,6 @@ export function appVersion(): string {
  * that came inside the APK (or in development).
  */
 export function installedUpdateId(): string | null {
-  return Updates.isEmbeddedLaunch ? null : shortUpdateId(Updates.updateId);
+  if (!Updates.isEnabled || Updates.isEmbeddedLaunch) return null;
+  return shortUpdateId(Updates.updateId);
 }
