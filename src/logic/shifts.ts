@@ -69,3 +69,8 @@ export function deliveriesLabel(count: number): string {
 export function closeShiftSummary(deliveryCount: number, rate: number): string {
   return `${deliveriesLabel(deliveryCount)} × ${formatMoney(rate)} = ${formatMoney(shiftTotal(deliveryCount, rate))}`;
 }
+
+/** "3 turnos" / "1 turno" */
+export function shiftsLabel(count: number): string {
+  return `${count} ${count === 1 ? 'turno' : 'turnos'}`;
+}
