@@ -34,6 +34,11 @@ export function backupFileName(now: number): string {
   return `gesty-respaldo-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`;
 }
 
+/** True for files written by `backupFileName` (used to clean old exports from the cache). */
+export function isBackupFileName(name: string): boolean {
+  return /^gesty-respaldo-\d{4}-\d{2}-\d{2}\.json$/.test(name);
+}
+
 export type ParseBackupResult = { ok: true; backup: Backup } | { ok: false; error: string };
 
 const NOT_A_BACKUP = 'El archivo no es un respaldo de Gesty.';
