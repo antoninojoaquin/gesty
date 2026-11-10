@@ -57,3 +57,8 @@ export function suggestAddresses(query: string, usage: readonly AddressUsage[]):
     .slice(0, MAX_SUGGESTIONS)
     .map((m) => ({ address: m.best.address, count: m.count }));
 }
+
+/** "3 veces" / "1 vez" */
+export function timesUsedLabel(count: number): string {
+  return count === 1 ? '1 vez' : `${count} veces`;
+}

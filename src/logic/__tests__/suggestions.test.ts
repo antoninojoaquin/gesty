@@ -1,4 +1,4 @@
-import { addressKey, suggestAddresses, type AddressUsage } from '../suggestions';
+import { addressKey, suggestAddresses, timesUsedLabel, type AddressUsage } from '../suggestions';
 
 const usage: AddressUsage[] = [
   { address: 'Belgrano 1450', count: 5, lastUsedAt: 100 },
@@ -49,5 +49,12 @@ describe('suggestAddresses', () => {
       { address: 'Calle B', count: 2, lastUsedAt: 9 },
     ];
     expect(suggestAddresses('calle', tied).map((s) => s.address)).toEqual(['Calle B', 'Calle A']);
+  });
+});
+
+describe('timesUsedLabel', () => {
+  it('pluralizes', () => {
+    expect(timesUsedLabel(1)).toBe('1 vez');
+    expect(timesUsedLabel(4)).toBe('4 veces');
   });
 });

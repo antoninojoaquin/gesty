@@ -1,5 +1,7 @@
 import {
   canCloseShift,
+  closeShiftSummary,
+  deliveriesLabel,
   forgottenShiftMessage,
   isForgottenShift,
   monthKeyOf,
@@ -83,5 +85,16 @@ describe('rateChangeNotice', () => {
     expect(rateChangeNotice(3000)).toBe(
       'El turno actual sigue con $ 3.000. La nueva tarifa se aplica desde el próximo turno.',
     );
+  });
+});
+
+describe('labels', () => {
+  it('pluralizes deliveries', () => {
+    expect(deliveriesLabel(1)).toBe('1 envío');
+    expect(deliveriesLabel(15)).toBe('15 envíos');
+  });
+
+  it('summarizes a shift before closing it', () => {
+    expect(closeShiftSummary(15, 3000)).toBe('15 envíos × $ 3.000 = $ 45.000');
   });
 });

@@ -59,3 +59,13 @@ export function forgottenShiftMessage(shift: Shift): string {
 export function rateChangeNotice(openShiftRate: number): string {
   return `El turno actual sigue con ${formatMoney(openShiftRate)}. La nueva tarifa se aplica desde el próximo turno.`;
 }
+
+/** "15 envíos" / "1 envío" */
+export function deliveriesLabel(count: number): string {
+  return `${count} ${count === 1 ? 'envío' : 'envíos'}`;
+}
+
+/** Confirmation before closing a shift: "15 envíos × $ 3.000 = $ 45.000" */
+export function closeShiftSummary(deliveryCount: number, rate: number): string {
+  return `${deliveriesLabel(deliveryCount)} × ${formatMoney(rate)} = ${formatMoney(shiftTotal(deliveryCount, rate))}`;
+}
