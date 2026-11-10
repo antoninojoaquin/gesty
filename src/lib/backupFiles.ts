@@ -4,14 +4,34 @@ import * as Sharing from 'expo-sharing';
 
 import { exportData } from '@/db/backup';
 import type { Db } from '@/db/types';
-import { backupFileName, buildBackup, parseBackup, serializeBackup, type ParseBackupResult } from '@/logic/backup';
+import {
+  backupFileName,
+  buildBackup,
+  isBackupFileName,
+  parseBackup,
+  serializeBackup,
+  type ParseBackupResult,
+} from '@/logic/backup';
+
+/** Deletes backup files left in the cache by previous exports, so they don't pile up. */
+function deleteOldExports(): void {
+  for (const entry of Paths.cache.list()) {
+    if (entry instanceof File && isBackupFileName(entry.name)) {
+      try {
+        entry.delete();
+      } catch {
+        // Not worth failing the export over a leftover file.
+      }
+    }
+  }
+}
 
 /** Writes every shift, delivery, closure and the rate to a JSON file and opens the share menu. */
 export async function shareBackup(db: Db): Promise<void> {
   const now = Date.now();
   const text = serializeBackup(buildBackup(await exportData(db), now));
+  deleteOldExports();
   const file = new File(Paths.cache, backupFileName(now));
-  if (file.exists) file.delete();
   await file.write(text);
   await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Guardar respaldo de Gesty' });
 }

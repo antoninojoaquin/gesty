@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Clock, History, Plus, Settings, Square, Trash2 } from 'lucide-react-native';
+import { Clock, History, Plus, Settings, Square, Trash2 } from '@/components/icons';
 import { useEffect, useRef, useState } from 'react';
 import { AppState, FlatList, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
 

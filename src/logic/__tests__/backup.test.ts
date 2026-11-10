@@ -2,6 +2,7 @@ import {
   backupFileName,
   buildBackup,
   importConfirmationMessage,
+  isBackupFileName,
   parseBackup,
   serializeBackup,
   type BackupData,
@@ -80,5 +81,14 @@ describe('parseBackup rejects', () => {
     const b = valid();
     mutate(b);
     expect(parse(b)).toEqual({ ok: false, error: 'El respaldo está dañado o incompleto.' });
+  });
+});
+
+describe('isBackupFileName', () => {
+  it('recognizes exported backup files only', () => {
+    expect(isBackupFileName(backupFileName(at(2026, 11, 10)))).toBe(true);
+    expect(isBackupFileName('gesty-respaldo-2026-11-10 (1).json')).toBe(false);
+    expect(isBackupFileName('otra-cosa.json')).toBe(false);
+    expect(isBackupFileName('gesty.db')).toBe(false);
   });
 });
