@@ -135,10 +135,12 @@ export default function ActiveShift() {
           <View style={styles.statusLine}>
             <View style={styles.dot} />
             <Text style={styles.statusText} numberOfLines={1}>
-              Turno en curso · desde <Text style={styles.statusTime}>{formatTime(shift.startedAt)}</Text>
+              Turno en curso
             </Text>
           </View>
-          <Text style={styles.rate}>{formatMoney(shift.rate)} c/u</Text>
+          <Text style={styles.rate} numberOfLines={1}>
+            desde <Text style={styles.statusTime}>{formatTime(shift.startedAt)}</Text> · {formatMoney(shift.rate)} c/u
+          </Text>
         </View>
         <View style={styles.headerButtons}>
           <IconButton Icon={History} label="Historial" size={sizes.iconButtonSmall} onPress={() => router.push('/history')} />
@@ -305,7 +307,8 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   rate: {
-    ...typography.label,
+    ...typography.bodyMuted,
+    ...tabularNums,
     marginLeft: 12 + spacing.sm,
   },
   headerButtons: {
