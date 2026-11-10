@@ -28,6 +28,8 @@ export const colors = {
   dangerBorder: '#5A2E25',
   /** Background of the app icon and lockup. */
   logoBg: '#16161A',
+  /** Dim layer behind dialogs. */
+  overlay: 'rgba(0, 0, 0, 0.7)',
 } as const;
 
 /** Opacity of the subtle diagonal red band (§4.1). */
