@@ -1,11 +1,5 @@
 import { migrations as defaultMigrations, type Migration } from './migrations';
-
-/** The subset of expo-sqlite's SQLiteDatabase the migrator needs (easy to fake in tests). */
-export type MigratableDb = {
-  execAsync(source: string): Promise<void>;
-  getFirstAsync<T>(source: string): Promise<T | null>;
-  withExclusiveTransactionAsync(task: (txn: MigratableDb) => Promise<void>): Promise<void>;
-};
+import type { Db } from './types';
 
 /** Throws if versions are not 1, 2, 3… in order. */
 export function assertValidMigrations(list: readonly Migration[]): void {
@@ -16,8 +10,8 @@ export function assertValidMigrations(list: readonly Migration[]): void {
   });
 }
 
-export async function getSchemaVersion(db: MigratableDb): Promise<number> {
-  const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
+export async function getSchemaVersion(db: Db): Promise<number> {
+  const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version', []);
   return row?.user_version ?? 0;
 }
 
@@ -26,7 +20,7 @@ export async function getSchemaVersion(db: MigratableDb): Promise<number> {
  * `user_version` bump, so a failed migration leaves the database at the previous version.
  * Returns the resulting schema version.
  */
-export async function migrate(db: MigratableDb, list: readonly Migration[] = defaultMigrations): Promise<number> {
+export async function migrate(db: Db, list: readonly Migration[] = defaultMigrations): Promise<number> {
   assertValidMigrations(list);
 
   const current = await getSchemaVersion(db);

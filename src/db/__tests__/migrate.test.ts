@@ -1,30 +1,6 @@
-import { DatabaseSync } from 'node:sqlite';
-
-import { assertValidMigrations, getSchemaVersion, migrate, type MigratableDb } from '../migrate';
+import { assertValidMigrations, getSchemaVersion, migrate } from '../migrate';
 import { DEFAULT_RATE, migrations, type Migration } from '../migrations';
-
-/** Wraps Node's built-in SQLite with the async API expo-sqlite exposes. */
-function createTestDb(): { db: MigratableDb; raw: DatabaseSync } {
-  const raw = new DatabaseSync(':memory:');
-  raw.exec('PRAGMA foreign_keys = ON');
-  const db: MigratableDb = {
-    execAsync: async (sql) => {
-      raw.exec(sql);
-    },
-    getFirstAsync: async <T,>(sql: string) => (raw.prepare(sql).get() as T | undefined) ?? null,
-    withExclusiveTransactionAsync: async (task) => {
-      raw.exec('BEGIN');
-      try {
-        await task(db);
-        raw.exec('COMMIT');
-      } catch (e) {
-        raw.exec('ROLLBACK');
-        throw e;
-      }
-    },
-  };
-  return { db, raw };
-}
+import { createTestDb } from '../testing';
 
 describe('migrations list', () => {
   it('has consecutive versions starting at 1', () => {
