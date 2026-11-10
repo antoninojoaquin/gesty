@@ -14,7 +14,7 @@ import { getRate, setRate } from '@/db/settings';
 import { getOpenShift } from '@/db/shifts';
 import type { Db } from '@/db/types';
 import { useFocusQuery } from '@/hooks/useFocusQuery';
-import { appVersion } from '@/lib/appInfo';
+import { appVersion, installedUpdateId } from '@/lib/appInfo';
 import { pickBackup, shareBackup } from '@/lib/backupFiles';
 import { confirm, showDialog, showError } from '@/lib/dialogs';
 import { importConfirmationMessage } from '@/logic/backup';
@@ -33,6 +33,7 @@ export default function Settings() {
   const [input, setInput] = useState('');
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const updateId = installedUpdateId();
 
   // Show the stored rate once it loads (and after it changes).
   useEffect(() => {
@@ -169,6 +170,7 @@ export default function Settings() {
       </ScrollView>
 
       <Text style={styles.footer}>Gesty · versión {appVersion()} · funciona sin internet</Text>
+      {updateId && <Text style={styles.footerUpdate}>Actualización {updateId}</Text>}
     </Screen>
   );
 }
@@ -225,5 +227,10 @@ const styles = StyleSheet.create({
     ...typography.label,
     textAlign: 'center',
     paddingTop: spacing.md,
+  },
+  footerUpdate: {
+    ...typography.label,
+    textAlign: 'center',
+    paddingTop: spacing.xs,
   },
 });
