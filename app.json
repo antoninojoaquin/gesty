@@ -4,6 +4,7 @@
     "slug": "gesty",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "scheme": "gesty",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0E0E10",
@@ -12,6 +13,10 @@
     ],
     "android": {
       "package": "com.joaquin.gesty",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#16161A"
+      },
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
@@ -19,6 +24,9 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/splash-lockup.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
           "backgroundColor": "#0E0E10"
         }
       ],
