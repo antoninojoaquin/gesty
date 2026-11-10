@@ -17,6 +17,7 @@ Referencias visuales:
 - Persistencia local con **expo-sqlite**. Sin backend, sin login, sin cuentas.
 - **100% offline.** La app no debe necesitar internet para nada (las fuentes se empaquetan con la app).
 - Solo **Android**. Se distribuye como **APK** instalado manualmente (no Play Store).
+- Package de Android: **`com.joaquin.gesty`** (no se puede cambiar una vez instalado el APK).
 - Configurar `eas.json` con un perfil (por ejemplo `preview`) que genere **`.apk`** (`"android": { "buildType": "apk" }`), no `.aab`.
 - Interfaz completamente en **español (Argentina)**.
 - Formato de dinero argentino: `$ 3.000`, `$ 45.000` (separador de miles con punto, sin decimales).
@@ -76,14 +77,19 @@ El APK se instala una sola vez a mano; los cambios posteriores tienen que llegar
 3. **El turno pertenece al día y al mes de su `inicio`**, aunque termine pasada la medianoche (ej.: viernes 21:00 → sábado 01:00 es "turno del viernes").
 4. Los días de trabajo son irregulares. No hay calendario ni turnos programados: el turno existe solo cuando se inicia desde la app.
 5. **Se puede editar la dirección o borrar un pedido** del turno abierto. Borrar pide confirmación.
+   - También en un **turno cerrado**, mientras su mes **no esté cerrado**: se pueden editar y borrar pedidos, y **borrar el turno entero**. Toda acción destructiva pide confirmación.
+   - Si borrar pedidos deja un turno cerrado con 0 pedidos, se sigue mostrando con total $ 0 hasta que se borre el turno.
 6. **Se permiten direcciones repetidas.**
 7. **No se puede cerrar un turno con 0 pedidos.** En ese caso ofrecer "Descartar turno" (con confirmación).
-8. **Turno olvidado abierto:** si al abrir la app hay un turno abierto con inicio hace más de 12 horas, mostrar un aviso: "Tenés un turno abierto desde el {día} a las {hora}. ¿Lo cerrás?" con opciones "Cerrar turno" y "Seguir con este turno". Al cerrarlo desde ese aviso, el `fin` es la hora del último pedido (o la actual si no hay pedidos).
+8. **Turno olvidado abierto:** si al abrir la app hay un turno abierto con inicio hace más de 12 horas, mostrar un aviso: "Tenés un turno abierto desde el {día} a las {hora}. ¿Lo cerrás?" con opciones "Cerrar turno" y "Seguir con este turno". Al cerrarlo desde ese aviso, el `fin` es la hora del último pedido.
+   - Si el turno olvidado tiene **0 pedidos**, no se puede cerrar (regla 7): el aviso ofrece **"Descartar turno"** (con confirmación) en lugar de "Cerrar turno".
 9. **Cierre de mes:**
-   - Se puede cerrar un mes calendario que tenga al menos un turno cerrado y ningún turno abierto.
+   - Se puede cerrar un mes calendario que **ya terminó** (no el mes en curso), que tenga al menos un turno cerrado y ningún turno abierto.
+   - Estados de un mes: **"En curso"** (el mes calendario actual), **"Sin cerrar"** (un mes pasado que todavía no se cerró) y **"Cerrado"** (con candado).
    - Genera un resumen del mes (ver 4.5) y registra el cierre.
    - Los turnos de un mes cerrado quedan **solo lectura**. Se puede **reabrir el mes** (con confirmación) para corregir algo.
 10. Cambiar la tarifa en Ajustes **solo afecta a los turnos que se inicien después**. Si hay un turno abierto, avisar: "El turno actual sigue con $X. La nueva tarifa se aplica desde el próximo turno."
+11. La tarifa es un **entero mayor que 0**. No se puede guardar vacía ni en 0.
 
 ---
 
@@ -99,6 +105,7 @@ Cada pantalla tiene su diseño de referencia en `docs/diseno/`. Respetá la estr
 
 ### 4.2 Turno activo (pantalla principal, la más importante) — `2-turno-activo.png`
 - Arriba: punto rojo + "Turno en curso · desde 21:05" y la tarifa.
+- Arriba a la derecha, dos **íconos chicos** de acceso a **Historial** y **Ajustes** (no están en el diseño; se agregan para poder cambiar la tarifa con un turno abierto, ver regla 10). Van lejos del botón "Agregar" para evitar toques accidentales.
 - Tarjeta con **cantidad de envíos** (muy grande) y **total en pesos** (grande, en rojo claro).
 - Campo de texto "Dirección" + botón **"Agregar"** grande.
   - El campo tiene foco automático al entrar a la pantalla.
@@ -111,6 +118,8 @@ Cada pantalla tiene su diseño de referencia en `docs/diseno/`. Respetá la estr
 ### 4.3 Resumen del turno — `3-resumen.png`
 Se muestra al cerrar un turno y al abrir un turno desde el historial.
 - Fecha (día de la semana incluido), hora de inicio y fin, duración.
+- La duración se escribe siempre con los minutos en dos cifras: `4 h 05 min` (en pantalla y al compartir).
+- Si se abre desde el historial y el mes del turno **no está cerrado**, permite editar y borrar pedidos y **borrar el turno** (ver regla 5). Si el mes está cerrado, todo es solo lectura.
 - **Total** destacado y "envíos × tarifa".
 - Lista de direcciones (las primeras y un "Ver las N direcciones").
 - Botón **"Compartir por WhatsApp"** usando la API `Share` de React Native con un texto así:
@@ -126,26 +135,39 @@ Total: $ 45.000
 - Botón "Volver al inicio".
 
 ### 4.4 Historial — `4-historial.png`
-- Agrupado por mes (el más reciente arriba). Cada mes muestra su total, turnos, envíos y si está "En curso" o "Cerrado" (con candado).
+- Agrupado por mes (el más reciente arriba). Cada mes muestra su total, turnos, envíos y su estado: "En curso", "Sin cerrar" o "Cerrado" (con candado) (ver regla 9).
 - Cada turno: **día de la semana + fecha**, cantidad de envíos, total. Tocar → Resumen del turno.
-- En cada mes sin cerrar: botón **"Cerrar mes"**.
+- Botón **"Cerrar mes"** solo en los meses **"Sin cerrar"** (meses pasados). El mes en curso no se puede cerrar.
+- Mes cerrado: se muestra resumido, con un link **"Ver turnos de {mes}"** que despliega sus turnos en el mismo lugar. Tocar el encabezado del mes abre su resumen (4.5) con la opción "Reabrir mes".
 
 ### 4.5 Cierre de mes — `5-cierre-mes.png`
 - Antes de confirmar, mostrar el resumen:
   - Mes y año.
   - **Total del mes**, cantidad de turnos, total de envíos.
-  - Promedio de envíos por turno y promedio cobrado por turno.
+  - Promedio de envíos por turno y promedio cobrado por turno. Envíos por turno con un decimal si no es exacto (`13,3`); el promedio cobrado se redondea al peso.
   - Lista de turnos (fecha, envíos, total).
   - Aviso: los turnos quedan solo lectura y se puede reabrir.
-- Botones "Confirmar cierre" y "Compartir por WhatsApp" (mismo estilo de texto que el turno).
+- Botones "Confirmar cierre" y "Compartir por WhatsApp" (mismo estilo de texto que el turno):
+
+```
+Noviembre 2026
+Turnos: 3
+Envíos: 39
+Total: $ 117.000
+
+Vie 7/11 · 15 envíos · $ 45.000
+Sáb 8/11 · 14 envíos · $ 42.000
+Dom 9/11 · 10 envíos · $ 30.000
+```
+
 - En un mes ya cerrado: ver el mismo resumen y opción "Reabrir mes".
 
 ### 4.6 Ajustes — `6-ajustes.png`
-- **Tarifa por envío** (input numérico grande, teclado numérico) + "Guardar tarifa".
+- **Tarifa por envío** (input numérico grande, teclado numérico) + "Guardar tarifa". Solo enteros mayores que 0 (regla 11).
 - **Respaldo:**
   - **Exportar datos:** genera un archivo JSON con todos los turnos, pedidos, cierres y ajustes, y abre el menú de compartir (`expo-sharing` + `expo-file-system`).
   - **Importar datos:** elegir un JSON exportado (`expo-document-picker`), mostrar cuántos turnos contiene y pedir confirmación porque **reemplaza** los datos actuales.
-- Al pie: "Gesty · versión X · funciona sin internet", más el identificador corto de la actualización OTA instalada (ver 1.1).
+- Al pie: "Gesty · versión X · funciona sin internet", más el identificador corto de la actualización OTA instalada (ver 1.1). El diseño no muestra el identificador, pero va igual.
 
 ---
 
@@ -158,7 +180,7 @@ Total: $ 45.000
 - **Botones grandes:** alto mínimo de 52–60 px, área táctil generosa.
 - Alto contraste, legible a la intemperie.
 - Nada de pantallas intermedias innecesarias: el flujo normal es *abrir app → escribir dirección → Agregar*.
-- Confirmaciones solo para acciones destructivas o importantes (borrar pedido, cerrar turno, descartar turno, cerrar/reabrir mes, importar).
+- Confirmaciones solo para acciones destructivas o importantes (borrar pedido, borrar turno, cerrar turno, descartar turno, cerrar/reabrir mes, importar).
 - Respetar safe areas y que el teclado no tape el campo ni el botón "Agregar".
 
 ### 5.2 Colores (definirlos como tokens en un único archivo de tema)
@@ -187,16 +209,17 @@ Total: $ 45.000
 Archivos en `assets/logo/`:
 - `gesty-icono.svg`: ícono de la app (G blanca con tilde rojo sobre fondo `#16161A`, esquinas redondeadas).
 - `gesty-lockup-oscuro.svg`: ícono + nombre, para fondos oscuros (el que se usa dentro de la app).
-- `gesty-lockup-claro.svg`, `gesty-logo-oscuro.svg`, `gesty-logo-claro.svg`: variantes.
+- `gesty-icono-foreground.svg`: la G y el tilde sin fondo, ya dentro de la zona segura. Es el foreground del ícono adaptativo.
+- `gesty-lockup-claro.svg`: variante del lockup para fondos claros.
 
 En el nombre, la "y" final tiene el tilde en rojo y la cola en blanco: no modificar el logo ni redibujarlo, usar los SVG tal cual.
 
 Usos:
-- **Ícono de la app:** exportar `gesty-icono.svg` a PNG 1024×1024 (`assets/icon.png`). Para el **ícono adaptativo de Android**, generar un foreground con la G y el tilde sobre fondo transparente, con margen de zona segura, y usar `#16161A` como `backgroundColor`.
+- **Ícono de la app:** exportar `gesty-icono.svg` a PNG 1024×1024 (`assets/icon.png`). Para el **ícono adaptativo de Android**, exportar `gesty-icono-foreground.svg` a PNG 1024×1024 (`assets/adaptive-icon.png`) y usar `#16161A` como `backgroundColor`.
 - **Splash screen:** `gesty-lockup-oscuro.svg` centrado sobre `#0E0E10` (con `expo-splash-screen`).
 - **Pantalla de Inicio:** el lockup arriba a la izquierda, ~40 px de alto. Para mostrar SVG en la app usar `react-native-svg` (o exportarlo a PNG si es más simple).
 
-> Nota: si en alguna captura de `docs/diseno/` el logo se ve distinto, vale el de `assets/logo/`.
+> Nota: si en alguna captura de `docs/diseno/` el logo se ve distinto, vale el de `assets/logo/`. Las capturas muestran una versión vieja del logo (una G cortada por una banda y el nombre en minúsculas): ignorarla. El logo correcto tiene una G con un tilde rojo y el nombre "Gesty" con la "y" en forma de tilde rojo.
 
 ---
 
