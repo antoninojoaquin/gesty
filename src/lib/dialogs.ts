@@ -35,11 +35,19 @@ export function confirm(
   });
 }
 
-/** Shows a failed action: the message of a UserError, or a generic one. */
+/**
+ * Shows a failed action: the message of a UserError, or a generic one.
+ * In development the technical error is also shown and logged, to diagnose it.
+ */
 export function showError(title: string, error: unknown): Promise<void> {
+  let message = error instanceof UserError ? error.message : 'Algo salió mal. Probá de nuevo.';
+  if (__DEV__ && !(error instanceof UserError)) {
+    console.error(`[${title}]`, error);
+    message += `\n\n[dev] ${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}`;
+  }
   return showDialog({
     title,
-    message: error instanceof UserError ? error.message : 'Algo salió mal. Probá de nuevo.',
+    message,
     Icon: AlertCircle,
     tone: 'danger',
     actions: [{ label: 'Entendido', value: undefined, variant: 'outline' }],
