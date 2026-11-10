@@ -64,16 +64,38 @@ export const fontSize = {
   bodyLarge: 20,
   title: 24,
   heading: 28,
+  /** Big call-to-action label ("Iniciar turno"). */
+  display: 30,
   /** Card numbers (month stats, history totals). */
   number: 32,
-  /** Shift total and home "last shift" figures. */
-  numberLarge: 44,
+  /** Home "last shift" figures. */
+  numberLarge: 40,
+  /** Active shift total. */
+  numberXL: 48,
   /** Shift counter and big summary totals. */
   numberHuge: 56,
 } as const;
 
 /** Tabular figures so counters and totals don't jump while updating. */
 export const tabularNums: TextStyle = { fontVariant: ['tabular-nums'] };
+
+/** Text presets measured on docs/diseno/. Spread them and override color if needed. */
+export const typography = {
+  body: { fontFamily: fonts.regular, fontSize: fontSize.body, color: colors.text },
+  bodyMuted: { fontFamily: fonts.regular, fontSize: fontSize.body, color: colors.textMuted },
+  label: { fontFamily: fonts.regular, fontSize: fontSize.caption, color: colors.textMuted },
+  /** Small caps section label: "ÚLTIMO TURNO", "DIRECCIONES". */
+  overline: {
+    fontFamily: fonts.semibold,
+    fontSize: fontSize.caption,
+    color: colors.textMuted,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  button: { fontFamily: fonts.bold, fontSize: fontSize.bodyLarge, color: colors.text },
+  title: { fontFamily: fonts.bold, fontSize: fontSize.heading, color: colors.text },
+  number: { fontFamily: fonts.numberBold, fontSize: fontSize.number, color: colors.text, ...tabularNums },
+} satisfies Record<string, TextStyle>;
 
 export const spacing = {
   xs: 4,
@@ -106,5 +128,12 @@ export const sizes = {
   logoHeight: 40,
 } as const;
 
-export const theme = { colors, fonts, fontSize, spacing, radius, sizes, bandOpacity, tabularNums };
+/** Lucide icon sizes and stroke. */
+export const icon = {
+  size: 26,
+  sizeSmall: 22,
+  stroke: 2,
+} as const;
+
+export const theme = { colors, fonts, fontSize, spacing, radius, sizes, bandOpacity, tabularNums, typography, icon };
 export type Theme = typeof theme;
