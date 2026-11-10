@@ -75,7 +75,7 @@ export default function ShiftSummary() {
   }
 
   async function onDeleteDelivery(delivery: Delivery) {
-    const ok = await confirm('Borrar envío', `¿Borrás "${delivery.address}"?`, 'Borrar', { destructive: true });
+    const ok = await confirm('¿Borrás este envío?', delivery.address, 'Borrar', { destructive: true, Icon: Trash2 });
     if (!ok) return;
     try {
       await deleteDelivery(db, delivery.id);
@@ -100,10 +100,10 @@ export default function ShiftSummary() {
 
   async function onDeleteShift() {
     const ok = await confirm(
-      'Borrar turno',
+      '¿Borrás el turno?',
       `Se borran el turno del ${formatLongDate(shift.startedAt).toLowerCase()} y sus ${deliveriesLabel(count)}.`,
       'Borrar turno',
-      { destructive: true },
+      { destructive: true, Icon: Trash2 },
     );
     if (!ok) return;
     try {

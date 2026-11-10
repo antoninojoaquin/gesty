@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { History, Plus, Settings, Square } from 'lucide-react-native';
+import { Clock, History, Plus, Settings, Square, Trash2 } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, AppState, FlatList, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
+import { AppState, FlatList, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -15,7 +15,7 @@ import { addDelivery, deleteDelivery, getAddressUsage, listDeliveries, updateDel
 import { closeShift, discardShift, getOpenShift } from '@/db/shifts';
 import type { Db } from '@/db/types';
 import { useFocusQuery } from '@/hooks/useFocusQuery';
-import { confirm, showError } from '@/lib/dialogs';
+import { confirm, showDialog, showError } from '@/lib/dialogs';
 import { formatTime } from '@/logic/dates';
 import { formatMoney } from '@/logic/money';
 import {
@@ -78,7 +78,7 @@ export default function ActiveShift() {
   }
 
   async function onDelete(delivery: Delivery) {
-    const ok = await confirm('Borrar envío', `¿Borrás "${delivery.address}"?`, 'Borrar', { destructive: true });
+    const ok = await confirm('¿Borrás este envío?', delivery.address, 'Borrar', { destructive: true, Icon: Trash2 });
     if (!ok) return;
     try {
       await deleteDelivery(db, delivery.id);
@@ -107,7 +107,7 @@ export default function ActiveShift() {
         'No hay envíos',
         'No se puede cerrar un turno sin envíos. ¿Querés descartarlo?',
         'Descartar turno',
-        { destructive: true },
+        { destructive: true, Icon: Trash2 },
       );
       if (!discard) return;
       try {
@@ -118,7 +118,10 @@ export default function ActiveShift() {
       }
       return;
     }
-    const ok = await confirm('Cerrar turno', closeShiftSummary(count, shift.rate), 'Cerrar turno');
+    const ok = await confirm('¿Cerrás el turno?', closeShiftSummary(count, shift.rate), 'Cerrar turno', {
+      Icon: Square,
+      highlight: formatMoney(shiftTotal(count, shift.rate)),
+    });
     if (!ok) return;
     try {
       await closeShift(db, shift.id, Date.now());
@@ -258,8 +261,9 @@ function useForgottenShiftPrompt(db: Db, shift: Shift | null, deliveries: Delive
           await closeShift(db, shift!.id, resolution.endedAt);
           router.replace({ pathname: '/summary/[id]', params: { id: String(shift!.id), closed: '1' } });
         } else {
-          const ok = await confirm('Descartar turno', 'El turno no tiene envíos y se va a borrar.', 'Descartar', {
+          const ok = await confirm('¿Descartás el turno?', 'No tiene envíos y se va a borrar.', 'Descartar turno', {
             destructive: true,
+            Icon: Trash2,
           });
           if (!ok) return;
           await discardShift(db, shift!.id);
@@ -270,10 +274,20 @@ function useForgottenShiftPrompt(db: Db, shift: Shift | null, deliveries: Delive
       }
     }
 
-    Alert.alert('Turno abierto', forgottenShiftMessage(shift), [
-      { text: 'Seguir con este turno', style: 'cancel' },
-      { text: resolution.action === 'close' ? 'Cerrar turno' : 'Descartar turno', onPress: closeIt },
-    ]);
+    showDialog({
+      title: 'Turno abierto',
+      message: forgottenShiftMessage(shift),
+      Icon: Clock,
+      actions: [
+        resolution.action === 'close'
+          ? { label: 'Cerrar turno', value: true, variant: 'primary' }
+          : { label: 'Descartar turno', value: true, variant: 'danger' },
+        { label: 'Seguir con este turno', value: false, variant: 'outline' },
+      ],
+      dismissValue: false,
+    }).then((close) => {
+      if (close) closeIt();
+    });
   }, [db, shift, deliveries, appActiveAt]);
 }
 

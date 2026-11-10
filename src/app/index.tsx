@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { History, Play, Settings } from 'lucide-react-native';
+import { Database, History, Play, Settings } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/Card';
 import { IconButton } from '@/components/IconButton';
@@ -10,9 +10,10 @@ import { Screen } from '@/components/Screen';
 import { importData } from '@/db/backup';
 import { getRate } from '@/db/settings';
 import { getLastClosedShift, getOpenShift, startShift } from '@/db/shifts';
-import { UserError, type Db } from '@/db/types';
+import type { Db } from '@/db/types';
 import { buildDemoData } from '@/dev/demoData';
 import { useFocusQuery } from '@/hooks/useFocusQuery';
+import { confirm, showError } from '@/lib/dialogs';
 import { formatLongDate, formatShortDate, formatTimeRange } from '@/logic/dates';
 import { formatMoney } from '@/logic/money';
 import { shiftTotal } from '@/logic/shifts';
@@ -23,18 +24,16 @@ const BAND_THICKNESS = 120;
 const BAND_ANGLE = '-32deg';
 
 /** DEVELOPMENT ONLY: replaces all data with the sample data shaped like docs/diseno/. */
-function loadDemoData(db: Db, onDone: () => void) {
-  Alert.alert('Datos de ejemplo', 'Reemplaza todos los datos por datos de ejemplo. Solo en desarrollo.', [
-    { text: 'Cancelar', style: 'cancel' },
-    {
-      text: 'Cargar',
-      style: 'destructive',
-      onPress: async () => {
-        await importData(db, buildDemoData(Date.now()));
-        onDone();
-      },
-    },
-  ]);
+async function loadDemoData(db: Db, onDone: () => void) {
+  const ok = await confirm(
+    'Datos de ejemplo',
+    'Reemplaza todos los datos por datos de ejemplo. Solo en desarrollo.',
+    'Cargar',
+    { destructive: true, Icon: Database },
+  );
+  if (!ok) return;
+  await importData(db, buildDemoData(Date.now()));
+  onDone();
 }
 
 async function loadHome(db: Db) {
@@ -59,7 +58,7 @@ export default function Home() {
       await startShift(db, Date.now());
       router.replace('/shift');
     } catch (e) {
-      Alert.alert('No se pudo iniciar el turno', e instanceof UserError ? e.message : 'Probá de nuevo.');
+      showError('No se pudo iniciar el turno', e);
       setStarting(false);
     }
   }
