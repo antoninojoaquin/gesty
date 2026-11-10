@@ -7,7 +7,9 @@
     "scheme": "gesty",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0E0E10",
-    "platforms": ["android"],
+    "platforms": [
+      "android"
+    ],
     "android": {
       "package": "com.joaquin.gesty",
       "predictiveBackGestureEnabled": false
@@ -19,7 +21,8 @@
         {
           "backgroundColor": "#0E0E10"
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,
