@@ -7,9 +7,11 @@ import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card } from '@/components/Card';
 import { IconButton } from '@/components/IconButton';
 import { Screen } from '@/components/Screen';
+import { importData } from '@/db/backup';
 import { getRate } from '@/db/settings';
 import { getLastClosedShift, getOpenShift, startShift } from '@/db/shifts';
 import { UserError, type Db } from '@/db/types';
+import { buildDemoData } from '@/dev/demoData';
 import { useFocusQuery } from '@/hooks/useFocusQuery';
 import { formatLongDate, formatShortDate, formatTimeRange } from '@/logic/dates';
 import { formatMoney } from '@/logic/money';
@@ -20,6 +22,21 @@ const RING = sizes.startButton + 20;
 const BAND_THICKNESS = 120;
 const BAND_ANGLE = '-32deg';
 
+/** DEVELOPMENT ONLY: replaces all data with the sample data shaped like docs/diseno/. */
+function loadDemoData(db: Db, onDone: () => void) {
+  Alert.alert('Datos de ejemplo', 'Reemplaza todos los datos por datos de ejemplo. Solo en desarrollo.', [
+    { text: 'Cancelar', style: 'cancel' },
+    {
+      text: 'Cargar',
+      style: 'destructive',
+      onPress: async () => {
+        await importData(db, buildDemoData(Date.now()));
+        onDone();
+      },
+    },
+  ]);
+}
+
 async function loadHome(db: Db) {
   const [open, last, rate] = await Promise.all([getOpenShift(db), getLastClosedShift(db), getRate(db)]);
   return { hasOpenShift: open !== null, last, rate };
@@ -27,7 +44,7 @@ async function loadHome(db: Db) {
 
 export default function Home() {
   const db = useSQLiteContext();
-  const { data } = useFocusQuery(loadHome);
+  const { data, reload } = useFocusQuery(loadHome);
   const [starting, setStarting] = useState(false);
 
   // With a shift in progress, the main screen is the active shift.
@@ -54,12 +71,14 @@ export default function Home() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Image
-          source={require('@/assets/images/logo-lockup.png')}
-          style={styles.logo}
-          resizeMode="contain"
-          accessibilityLabel="Gesty"
-        />
+        <Pressable onLongPress={__DEV__ ? () => loadDemoData(db, reload) : undefined} accessible={false}>
+          <Image
+            source={require('@/assets/images/logo-lockup.png')}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel="Gesty"
+          />
+        </Pressable>
         <View style={styles.headerButtons}>
           <IconButton Icon={History} label="Historial" onPress={() => router.push('/history')} />
           <IconButton Icon={Settings} label="Ajustes" onPress={() => router.push('/settings')} />
