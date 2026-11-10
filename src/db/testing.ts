@@ -27,6 +27,8 @@ export function createTestDb(): { db: Db; raw: DatabaseSync } {
       // Like expo-sqlite, transactions are not reentrant: catch accidental nesting in tests.
       if (inTransaction) throw new Error('Nested transaction');
       inTransaction = true;
+      // expo-sqlite runs the transaction on a new connection, without PRAGMA foreign_keys: mimic it.
+      raw.exec('PRAGMA foreign_keys = OFF');
       raw.exec('BEGIN EXCLUSIVE');
       try {
         await task(db);
@@ -35,6 +37,7 @@ export function createTestDb(): { db: Db; raw: DatabaseSync } {
         raw.exec('ROLLBACK');
         throw e;
       } finally {
+        raw.exec('PRAGMA foreign_keys = ON');
         inTransaction = false;
       }
     },
