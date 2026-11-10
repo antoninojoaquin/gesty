@@ -37,5 +37,6 @@
   },
   "jest": {
     "preset": "jest-expo"
-  }
+  },
+  "license": "MIT"
 }
