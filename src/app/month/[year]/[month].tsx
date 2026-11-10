@@ -49,6 +49,12 @@ export default function MonthClose() {
 
   async function onConfirmClose() {
     if (busy) return;
+    const ok = await confirm(
+      'Cerrar mes',
+      `Los turnos de ${name} van a quedar solo lectura. Podés reabrirlo desde el historial.`,
+      'Cerrar mes',
+    );
+    if (!ok) return;
     setBusy(true);
     try {
       await closeMonth(db, key, Date.now());
