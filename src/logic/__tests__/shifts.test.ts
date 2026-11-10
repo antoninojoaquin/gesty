@@ -2,6 +2,7 @@ import {
   canCloseShift,
   closeShiftSummary,
   deliveriesLabel,
+  shiftsLabel,
   forgottenShiftMessage,
   isForgottenShift,
   monthKeyOf,
@@ -96,5 +97,12 @@ describe('labels', () => {
 
   it('summarizes a shift before closing it', () => {
     expect(closeShiftSummary(15, 3000)).toBe('15 envíos × $ 3.000 = $ 45.000');
+  });
+});
+
+describe('shiftsLabel', () => {
+  it('pluralizes shifts', () => {
+    expect(shiftsLabel(1)).toBe('1 turno');
+    expect(shiftsLabel(3)).toBe('3 turnos');
   });
 });
