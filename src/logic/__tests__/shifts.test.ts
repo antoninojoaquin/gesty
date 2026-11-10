@@ -96,7 +96,7 @@ describe('labels', () => {
   });
 
   it('summarizes a shift before closing it', () => {
-    expect(closeShiftSummary(15, 3000)).toBe('15 envíos × $ 3.000 = $ 45.000');
+    expect(closeShiftSummary(15, 3000)).toBe('15 envíos × $ 3.000');
   });
 });
 

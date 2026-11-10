@@ -65,9 +65,9 @@ export function deliveriesLabel(count: number): string {
   return `${count} ${count === 1 ? 'envío' : 'envíos'}`;
 }
 
-/** Confirmation before closing a shift: "15 envíos × $ 3.000 = $ 45.000" */
+/** Formula shown under the total when closing a shift: "15 envíos × $ 3.000" */
 export function closeShiftSummary(deliveryCount: number, rate: number): string {
-  return `${deliveriesLabel(deliveryCount)} × ${formatMoney(rate)} = ${formatMoney(shiftTotal(deliveryCount, rate))}`;
+  return `${deliveriesLabel(deliveryCount)} × ${formatMoney(rate)}`;
 }
 
 /** "3 turnos" / "1 turno" */

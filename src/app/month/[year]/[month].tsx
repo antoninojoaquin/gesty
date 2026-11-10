@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { ChevronLeft, Info, Lock, Share2 } from 'lucide-react-native';
+import { ChevronLeft, Info, Lock, LockOpen, Share2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 
@@ -50,9 +50,10 @@ export default function MonthClose() {
   async function onConfirmClose() {
     if (busy) return;
     const ok = await confirm(
-      'Cerrar mes',
+      `¿Cerrás ${name}?`,
       `Los turnos de ${name} van a quedar solo lectura. Podés reabrirlo desde el historial.`,
       'Cerrar mes',
+      { Icon: Lock, highlight: data?.group ? formatMoney(data.group.total) : undefined },
     );
     if (!ok) return;
     setBusy(true);
@@ -69,9 +70,10 @@ export default function MonthClose() {
 
   async function onReopen() {
     const ok = await confirm(
-      'Reabrir mes',
+      `¿Reabrís ${name}?`,
       `Los turnos de ${name} se van a poder editar de nuevo. Después podés volver a cerrarlo.`,
       'Reabrir mes',
+      { Icon: LockOpen },
     );
     if (!ok) return;
     try {
