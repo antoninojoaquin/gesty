@@ -5,6 +5,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { DialogHost } from '@/components/DialogHost';
 import { DATABASE_NAME, initDatabase } from '@/db/setup';
 import { colors, fontAssets } from '@/theme';
 
@@ -38,6 +39,7 @@ function App() {
           animation: 'fade',
         }}
       />
+      <DialogHost />
     </>
   );
 }
