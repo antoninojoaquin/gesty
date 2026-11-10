@@ -54,7 +54,20 @@
     },
     "updates": {
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
-    }
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/06fe5d2f-2b81-4497-a8c9-85d49baad30b"
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "06fe5d2f-2b81-4497-a8c9-85d49baad30b"
+      }
+    },
+    "owner": "antoninojoaquin",
+    "ios": {}
   }
 }
